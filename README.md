@@ -22,9 +22,9 @@ Control your Binary Matrix 8x8 HDMI switcher through Home Assistant with an intu
 
 ### Quick Installation (Recommended)
 
-Click this button and follow the provided directions:
+Click this button to open HACS and add the repository:
 
-[![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.][add-repo-shield]][add-repo]
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.][add-repo-shield]][add-repo]
 
 ### Manual HACS Installation
 
@@ -126,5 +126,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 [hacs]: https://github.com/hacs/integration
 [hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg
 [license-shield]: https://img.shields.io/github/license/Salain810/Binary8x8.svg
-[add-repo-shield]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
-[add-repo]: https://my.home-assistant.io/redirect/hacs_repository/?repository=https%3A%2F%2Fgithub.com%2FSalain810%2FBinary8x8&category=integration
+[add-repo-shield]: https://my.home-assistant.io/badges/hacs_repository.svg
+[add-repo]: https://my.home-assistant.io/redirect/hacs_repository/?owner=Salain810&repository=Binary8x8&category=integration
