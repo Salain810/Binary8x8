@@ -1,11 +1,13 @@
 {
   "domain": "binary_matrix",
   "name": "Binary Matrix 8x8 HDMI Switcher",
-  "documentation": "https://github.com/yourusername/binary_matrix",
+  "documentation": "https://github.com/Salain810/Binary8x8",
+  "issue_tracker": "https://github.com/Salain810/Binary8x8/issues",
   "dependencies": [],
-  "codeowners": [],
+  "codeowners": ["@Salain810"],
   "requirements": ["telnetlib3"],
   "iot_class": "local_push",
   "version": "1.0.0",
-  "config_flow": true
+  "config_flow": true,
+  "homeassistant": "2025.4.0"
 }

@@ -4,45 +4,50 @@
 [![GitHub Activity][commits-shield]][commits]
 [![License][license-shield]](LICENSE)
 [![hacs][hacsbadge]][hacs]
-![Project Maintenance][maintenance-shield]
+[![GitHub issues](https://img.shields.io/github/issues/Salain810/Binary8x8)](https://github.com/Salain810/Binary8x8/issues)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-This integration allows you to control a Binary Matrix 8x8 HDMI switcher through Home Assistant.
+Control your Binary Matrix 8x8 HDMI switcher through Home Assistant with an intuitive interface.
 
 ## Features
 
-- Control and monitor 8x8 HDMI matrix switching
-- Telnet-based communication
-- Auto-reconnect on connection loss
-- User-friendly configuration through Home Assistant UI
-- Service calls for automation integration
-- Real-time state updates
-- HACS compatible
+- ✨ Control and monitor 8x8 HDMI matrix switching
+- 🔄 Real-time state updates
+- 🛡️ Secure telnet-based communication
+- 🔌 Auto-reconnect on connection loss
+- 🎯 User-friendly configuration through Home Assistant UI
+- 🤖 Service calls for automation integration
 
 ## Installation
 
-### HACS (Recommended)
+### Quick Installation (Recommended)
 
-1. Install HACS if you haven't already (see [HACS installation guide](https://hacs.xyz/docs/installation/manual))
-2. Add this repository to HACS:
-   - Go to HACS in your Home Assistant instance
-   - Click on "Integrations"
-   - Click the three dots in the top right
-   - Click "Custom repositories"
-   - Add the URL of this repository
-   - Select "Integration" as the category
-3. Click "Download"
+Click this button and follow the provided directions:
+
+[![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.][add-repo-shield]][add-repo]
+
+### Manual HACS Installation
+
+1. Ensure [HACS](https://hacs.xyz) is installed in your Home Assistant instance
+2. Add this repository as a custom repository in HACS:
+   - Open HACS in Home Assistant
+   - Click on the three dots in the top right corner
+   - Select "Custom repositories"
+   - Add `https://github.com/Salain810/Binary8x8` as URL
+   - Select "Integration" as category
+3. Click Install
 4. Restart Home Assistant
 
 ### Manual Installation
 
-1. Copy the `custom_components/binary_matrix` folder to your Home Assistant's `custom_components` directory
+1. Copy the `custom_components/binary_matrix` directory to your Home Assistant's `custom_components` directory
 2. Restart Home Assistant
 
 ## Configuration
 
 1. Go to Configuration -> Integrations
 2. Click the "+" button and search for "Binary Matrix 8x8 HDMI Switcher"
-3. Enter the following details:
+3. Enter your device's details:
    - **Name**: A name for your matrix switcher
    - **Host**: IP address of your matrix switcher (e.g., 192.168.4.200)
    - **Port**: Telnet port (default: 23)
@@ -54,15 +59,13 @@ This integration allows you to control a Binary Matrix 8x8 HDMI switcher through
 ### Entities
 
 The integration creates number entities for each output, allowing you to:
-
 - View current input selection for each output
-- Change input selection through the Home Assistant UI
+- Change input selection through sliders
 - Monitor connection status
 
 ### Services
 
 #### binary_matrix.switch_input
-
 Switch a specific output to a specific input.
 
 Parameters:
@@ -77,39 +80,51 @@ data:
   input: 2
 ```
 
-## Troubleshooting
+### Automations Example
 
-### Common Issues
+```yaml
+automation:
+  - alias: "Switch HDMI Input on TV Power On"
+    trigger:
+      - platform: state
+        entity_id: switch.tv_power
+        to: "on"
+    action:
+      - service: binary_matrix.switch_input
+        data:
+          output: 1  # TV
+          input: 2   # Gaming Console
+```
 
-1. **Cannot Connect**
-   - Verify the IP address is correct
-   - Ensure the matrix switcher is powered on and connected to the network
-   - Check if telnet port (23) is accessible
+## Support
 
-2. **Authentication Failed**
-   - Verify username and password
-   - Try power cycling the matrix switcher
+Got issues or questions? Here's how to get help:
 
-3. **Connection Lost**
-   - The integration will automatically attempt to reconnect
-   - Check network connectivity
-   - Verify the matrix switcher is still powered on and responsive
+- 🐛 Found a bug? [Open an issue](https://github.com/Salain810/Binary8x8/issues)
+- 💡 Have an idea? [Submit a feature request](https://github.com/Salain810/Binary8x8/issues)
+- 🤔 Need help? [Check existing issues](https://github.com/Salain810/Binary8x8/issues?q=is%3Aissue)
 
 ## Contributing
 
-If you want to contribute to this please read the [Contribution guidelines](CONTRIBUTING.md)
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a pull request.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-***
+## Acknowledgments
 
-[commits-shield]: https://img.shields.io/github/commit-activity/y/custom-components/binary_matrix.svg
-[commits]: https://github.com/custom-components/binary_matrix/commits/main
+- Thanks to the Home Assistant community
+- Special thanks to all contributors
+
+---
+
+[releases-shield]: https://img.shields.io/github/release/Salain810/Binary8x8.svg
+[releases]: https://github.com/Salain810/Binary8x8/releases
+[commits-shield]: https://img.shields.io/github/commit-activity/y/Salain810/Binary8x8.svg
+[commits]: https://github.com/Salain810/Binary8x8/commits/main
 [hacs]: https://github.com/hacs/integration
 [hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg
-[license-shield]: https://img.shields.io/github/license/custom-components/binary_matrix.svg
-[maintenance-shield]: https://img.shields.io/badge/maintainer-%40yourusername-blue.svg
-[releases-shield]: https://img.shields.io/github/release/custom-components/binary_matrix.svg
-[releases]: https://github.com/custom-components/binary_matrix/releases
+[license-shield]: https://img.shields.io/github/license/Salain810/Binary8x8.svg
+[add-repo-shield]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
+[add-repo]: https://my.home-assistant.io/redirect/hacs_repository/?repository=https%3A%2F%2Fgithub.com%2FSalain810%2FBinary8x8&category=integration
