@@ -60,14 +60,25 @@ Click this button to open HACS and add the repository:
 
 ### Prerequisites
 
-1. Install [Button Card](https://github.com/custom-cards/button-card) from HACS:
-   - Open HACS -> Frontend
-   - Search for "Button Card"
-   - Install and restart Home Assistant
+1. Install [button-card](https://github.com/custom-cards/button-card) from HACS:
+   ```yaml
+   # In your configuration.yaml
+   frontend:
+     extra_module_url:
+       - /hacsfiles/button-card/button-card.js
+   ```
 
-### Installation
+2. Add the custom card to your resources:
+   - Go to Configuration -> Dashboards
+   - Click the three dots menu in the top right
+   - Select "Resources"
+   - Click "Add Resource"
+   - Add `/hacsfiles/button-card/button-card.js`
+   - Select "JavaScript Module" as Resource Type
 
-1. Copy the contents of [example-dashboard.yaml](example-dashboard.yaml) 
+### Quick Dashboard Setup
+
+1. Copy the contents of [example-dashboard.yaml](example-dashboard.yaml)
 2. In Home Assistant:
    - Go to Overview
    - Click the three dots menu in top right
@@ -77,30 +88,58 @@ Click this button to open HACS and add the repository:
    - Paste the configuration
    - Click Save
 
-The dashboard provides:
-- 8x8 grid layout matching your matrix
-- Click to cycle through inputs for each output
-- Current input status display
-- Responsive design that works on mobile and desktop
+### Customizing the Dashboard
 
-## Version Management
+The dashboard uses a template to create consistent buttons for each output. You can customize:
 
-This integration uses automated semantic versioning:
+1. Button Appearance:
+   ```yaml
+   styles:
+     card:
+       - height: 100px  # Adjust button size
+       - background-color: var(--card-background-color)  # Change background
+   ```
 
-- Major version (x.0.0): Breaking changes
-- Minor version (0.x.0): New features
-- Patch version (0.0.x): Bug fixes and small changes
+2. Input Labels:
+   ```yaml
+   # Add custom names for your inputs
+   name: '[[[ 
+     const names = {
+       "1": "Apple TV",
+       "2": "PlayStation",
+       "3": "Xbox",
+       "4": "Nintendo",
+       "5": "Chromecast",
+       "6": "PC",
+       "7": "Cable Box",
+       "8": "Camera"
+     };
+     return `${names[entity.state] || `Input ${entity.state}`}`;
+   ]]]'
+   ```
 
-Versions are automatically incremented based on commit messages when pushing to the main branch. For details on how this works, see [CONTRIBUTING.md](CONTRIBUTING.md).
+3. Output Labels:
+   ```yaml
+   # Add custom names for your outputs
+   name: '[[[ 
+     const names = {
+       "1": "Living Room TV",
+       "2": "Bedroom TV",
+       "3": "Office Monitor",
+       "4": "Kitchen TV"
+     };
+     return names[entity.split("_")[1]] || `Output ${entity.split("_")[1]}`;
+   ]]]'
+   ```
 
 ## Usage
 
 ### Entities
 
-The integration creates number entities for each output, allowing you to:
-- View current input selection for each output
-- Change input selection through sliders
-- Monitor connection status
+The integration creates number entities for each output:
+- `number.output_1` through `number.output_8`
+- Values 1-8 represent the current input
+- Can be controlled via service calls or UI
 
 ### Services
 
@@ -115,24 +154,29 @@ Example service call:
 ```yaml
 service: binary_matrix.switch_input
 data:
-  output: 1
-  input: 2
+  output: 1  # Living Room TV
+  input: 2   # PlayStation
 ```
 
 ### Automations Example
 
 ```yaml
 automation:
-  - alias: "Switch HDMI Input on TV Power On"
+  - alias: "Game Night Mode"
     trigger:
-      - platform: state
-        entity_id: switch.tv_power
-        to: "on"
+      - platform: time
+        at: "20:00:00"
     action:
+      # Route PlayStation to Living Room TV
       - service: binary_matrix.switch_input
         data:
-          output: 1  # TV
-          input: 2   # Gaming Console
+          output: 1  # Living Room TV
+          input: 2   # PlayStation
+      # Route Cable Box to Kitchen TV
+      - service: binary_matrix.switch_input
+        data:
+          output: 4  # Kitchen TV
+          input: 7   # Cable Box
 ```
 
 ## Support

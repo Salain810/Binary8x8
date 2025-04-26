@@ -3,30 +3,31 @@
         "step": {
             "user": {
                 "title": "Set up Binary Matrix 8x8 HDMI Switcher",
+                "description": "Connect to your Binary Matrix 8x8 HDMI switcher",
                 "data": {
-                    "name": "Name",
-                    "host": "Host",
-                    "port": "Port",
-                    "username": "Username",
+                    "name": "Switcher Name",
+                    "host": "IP Address (e.g., 192.168.4.200)",
+                    "port": "Port (default: 23)",
+                    "username": "Username (default: admin)",
                     "password": "Password"
                 }
             },
             "reauth_confirm": {
                 "title": "Reauthenticate with Binary Matrix",
-                "description": "The password needs to be updated.",
+                "description": "The password needs to be updated",
                 "data": {
                     "password": "Password"
                 }
             }
         },
         "error": {
-            "cannot_connect": "Failed to connect",
-            "invalid_auth": "Invalid authentication",
-            "unknown": "Unexpected error"
+            "cannot_connect": "Failed to connect. Please verify the IP address and port, and ensure the device is powered on and connected to the network.",
+            "invalid_auth": "Invalid authentication. Please check your username and password.",
+            "unknown": "Unexpected error occurred. Please check the Home Assistant logs for details."
         },
         "abort": {
-            "already_configured": "Device is already configured",
-            "reauth_successful": "Reauthentication was successful"
+            "already_configured": "This Binary Matrix device is already configured.",
+            "reauth_successful": "Reauthentication was successful."
         }
     },
     "services": {
@@ -41,6 +42,18 @@
                 "input": {
                     "name": "Input",
                     "description": "Input number (1-8)"
+                }
+            }
+        }
+    },
+    "entity": {
+        "number": {
+            "output": {
+                "name": "Output {number}",
+                "state_attributes": {
+                    "input": {
+                        "name": "Current Input"
+                    }
                 }
             }
         }

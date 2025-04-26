@@ -1,159 +1,114 @@
 title: HDMI Matrix
-type: grid
-square: false
-columns: 8
-cards:
-  # Output 1
-  - type: custom:button-card
-    entity: number.output_1
-    name: Out 1
-    label: Input {{state}}
-    show_label: true
-    tap_action:
-      action: call-service
-      service: number.set_value
-      target:
-        entity_id: number.output_1
-      data:
-        value: >
-          [[[
-            return (parseInt(entity.state) % 8) + 1;
-          ]]]
-
-  # Output 2
-  - type: custom:button-card
-    entity: number.output_2
-    name: Out 2
-    label: Input {{state}}
-    show_label: true
-    tap_action:
-      action: call-service
-      service: number.set_value
-      target:
-        entity_id: number.output_2
-      data:
-        value: >
-          [[[
-            return (parseInt(entity.state) % 8) + 1;
-          ]]]
-
-  # Output 3
-  - type: custom:button-card
-    entity: number.output_3
-    name: Out 3
-    label: Input {{state}}
-    show_label: true
-    tap_action:
-      action: call-service
-      service: number.set_value
-      target:
-        entity_id: number.output_3
-      data:
-        value: >
-          [[[
-            return (parseInt(entity.state) % 8) + 1;
-          ]]]
-
-  # Output 4
-  - type: custom:button-card
-    entity: number.output_4
-    name: Out 4
-    label: Input {{state}}
-    show_label: true
-    tap_action:
-      action: call-service
-      service: number.set_value
-      target:
-        entity_id: number.output_4
-      data:
-        value: >
-          [[[
-            return (parseInt(entity.state) % 8) + 1;
-          ]]]
-
-  # Output 5
-  - type: custom:button-card
-    entity: number.output_5
-    name: Out 5
-    label: Input {{state}}
-    show_label: true
-    tap_action:
-      action: call-service
-      service: number.set_value
-      target:
-        entity_id: number.output_5
-      data:
-        value: >
-          [[[
-            return (parseInt(entity.state) % 8) + 1;
-          ]]]
-
-  # Output 6
-  - type: custom:button-card
-    entity: number.output_6
-    name: Out 6
-    label: Input {{state}}
-    show_label: true
-    tap_action:
-      action: call-service
-      service: number.set_value
-      target:
-        entity_id: number.output_6
-      data:
-        value: >
-          [[[
-            return (parseInt(entity.state) % 8) + 1;
-          ]]]
-
-  # Output 7
-  - type: custom:button-card
-    entity: number.output_7
-    name: Out 7
-    label: Input {{state}}
-    show_label: true
-    tap_action:
-      action: call-service
-      service: number.set_value
-      target:
-        entity_id: number.output_7
-      data:
-        value: >
-          [[[
-            return (parseInt(entity.state) % 8) + 1;
-          ]]]
-
-  # Output 8
-  - type: custom:button-card
-    entity: number.output_8
-    name: Out 8
-    label: Input {{state}}
-    show_label: true
-    tap_action:
-      action: call-service
-      service: number.set_value
-      target:
-        entity_id: number.output_8
-      data:
-        value: >
-          [[[
-            return (parseInt(entity.state) % 8) + 1;
-          ]]]
-
-  # Custom styling for all buttons
+type: custom:button-card
 styles:
   grid:
     - grid-template-columns: repeat(8, 1fr)
-    - grid-gap: 12px
-    - padding: 12px
-  card:
-    - background-color: var(--primary-background-color)
-    - border-radius: 10px
-    - box-shadow: var(--ha-card-box-shadow)
-    - padding: 16px
-  name:
-    - font-weight: bold
-    - font-size: 14px
-  label:
-    - font-size: 12px
-    - color: var(--primary-text-color)
-    - opacity: 0.8
+    - grid-gap: 8px
+    - padding: 8px
+
+# Define device names for inputs and outputs
+variables:
+  inputs:
+    "1": "Apple TV"
+    "2": "PlayStation"
+    "3": "Xbox"
+    "4": "Nintendo"
+    "5": "Chromecast"
+    "6": "PC"
+    "7": "Cable Box"
+    "8": "Camera"
+  outputs:
+    "1": "Living Room"
+    "2": "Bedroom"
+    "3": "Office"
+    "4": "Kitchen"
+    "5": "Game Room"
+    "6": "Theater"
+    "7": "Basement"
+    "8": "Patio"
+
+# Template for matrix output buttons
+template:
+  matrixOutput:
+    layout: vertical
+    icon: mdi:video-input-hdmi
+    show_label: true
+    show_name: true
+    name: >
+      [[[
+        const outNum = entity.split('_')[1];
+        const outName = variables.outputs[outNum];
+        return outName || `Output ${outNum}`;
+      ]]]
+    label: >
+      [[[
+        const input = Math.round(entity.state);
+        const inputName = variables.inputs[input];
+        return inputName || `Input ${input}`;
+      ]]]
+    styles:
+      card:
+        - height: 100px
+        - border-radius: var(--ha-card-border-radius, 4px)
+        - background-color: var(--card-background-color)
+      name:
+        - font-size: 14px
+        - font-weight: bold
+      label:
+        - font-size: 12px
+        - color: var(--secondary-text-color)
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: '[[[ return entity.entity_id ]]]'
+      data:
+        value: >
+          [[[ 
+            return entity.state >= 8 ? 1 : Math.round(entity.state) + 1;
+          ]]]
+    state:
+      - operator: "template"
+        value: >
+          [[[ 
+            return entity.state && entity.state > 0;
+          ]]]
+        styles:
+          card:
+            - box-shadow: "inset 0 0 0 2px var(--primary-color)"
+      - operator: "default"
+        styles:
+          icon:
+            - color: var(--primary-text-color)
+            - opacity: 0.5
+
+# Main grid layout
+cards:
+  - type: grid
+    title: Binary Matrix 8x8 HDMI Control
+    columns: 8
+    cards:
+      - type: custom:button-card
+        template: matrixOutput
+        entity: number.output_1
+      - type: custom:button-card
+        template: matrixOutput
+        entity: number.output_2
+      - type: custom:button-card
+        template: matrixOutput
+        entity: number.output_3
+      - type: custom:button-card
+        template: matrixOutput
+        entity: number.output_4
+      - type: custom:button-card
+        template: matrixOutput
+        entity: number.output_5
+      - type: custom:button-card
+        template: matrixOutput
+        entity: number.output_6
+      - type: custom:button-card
+        template: matrixOutput
+        entity: number.output_7
+      - type: custom:button-card
+        template: matrixOutput
+        entity: number.output_8

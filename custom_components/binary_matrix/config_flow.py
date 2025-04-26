@@ -40,13 +40,18 @@ class MatrixConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             try:
-                await self._test_connection(
+                # Validate connection and authentication
+                matrix = MatrixController(
                     host=user_input[CONF_HOST],
                     port=user_input.get(CONF_PORT, DEFAULT_PORT),
                     username=user_input.get(CONF_USERNAME, DEFAULT_USERNAME),
                     password=user_input[CONF_PASSWORD],
                 )
 
+                await matrix.connect()
+                await matrix.disconnect()
+
+                # Create unique ID from host
                 await self.async_set_unique_id(user_input[CONF_HOST])
                 self._abort_if_unique_id_configured()
 
@@ -57,12 +62,15 @@ class MatrixConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             except MatrixConnectionError:
                 errors["base"] = ERROR_CANNOT_CONNECT
+                _LOGGER.exception("Connection failed")
             except MatrixAuthError:
                 errors["base"] = ERROR_INVALID_AUTH
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception")
+                _LOGGER.exception("Authentication failed")
+            except Exception as ex:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected error: %s", ex)
                 errors["base"] = ERROR_UNKNOWN
 
+        # Show initial configuration form
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
@@ -92,28 +100,36 @@ class MatrixConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None and self._reauth_entry:
             try:
-                await self._test_connection(
+                matrix = MatrixController(
                     host=self._reauth_entry.data[CONF_HOST],
                     port=self._reauth_entry.data.get(CONF_PORT, DEFAULT_PORT),
                     username=self._reauth_entry.data.get(CONF_USERNAME, DEFAULT_USERNAME),
                     password=user_input[CONF_PASSWORD],
                 )
 
-                entry_data = {**self._reauth_entry.data, CONF_PASSWORD: user_input[CONF_PASSWORD]}
-                self.hass.config_entries.async_update_entry(self._reauth_entry, data=entry_data)
-                
-                self.hass.async_create_task(
-                    self.hass.config_entries.async_reload(self._reauth_entry.entry_id)
-                )
+                await matrix.connect()
+                await matrix.disconnect()
 
+                entry_data = {
+                    **self._reauth_entry.data,
+                    CONF_PASSWORD: user_input[CONF_PASSWORD],
+                }
+                
+                self.hass.config_entries.async_update_entry(
+                    self._reauth_entry, data=entry_data
+                )
+                
+                await self.hass.config_entries.async_reload(self._reauth_entry.entry_id)
                 return self.async_abort(reason="reauth_successful")
 
             except MatrixAuthError:
                 errors["base"] = ERROR_INVALID_AUTH
+                _LOGGER.exception("Authentication failed during reauth")
             except MatrixConnectionError:
                 errors["base"] = ERROR_CANNOT_CONNECT
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception")
+                _LOGGER.exception("Connection failed during reauth")
+            except Exception as ex:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected error during reauth: %s", ex)
                 errors["base"] = ERROR_UNKNOWN
 
         return self.async_show_form(
@@ -121,19 +137,3 @@ class MatrixConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema({vol.Required(CONF_PASSWORD): str}),
             errors=errors,
         )
-
-    async def _test_connection(
-        self, host: str, port: int, username: str, password: str
-    ) -> None:
-        """Test the connection to the matrix."""
-        matrix = MatrixController(
-            host=host,
-            port=port,
-            username=username,
-            password=password,
-        )
-
-        try:
-            await matrix.connect()
-        finally:
-            await matrix.disconnect()
