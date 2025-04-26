@@ -1,0 +1,159 @@
+title: HDMI Matrix
+type: grid
+square: false
+columns: 8
+cards:
+  # Output 1
+  - type: custom:button-card
+    entity: number.output_1
+    name: Out 1
+    label: Input {{state}}
+    show_label: true
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: number.output_1
+      data:
+        value: >
+          [[[
+            return (parseInt(entity.state) % 8) + 1;
+          ]]]
+
+  # Output 2
+  - type: custom:button-card
+    entity: number.output_2
+    name: Out 2
+    label: Input {{state}}
+    show_label: true
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: number.output_2
+      data:
+        value: >
+          [[[
+            return (parseInt(entity.state) % 8) + 1;
+          ]]]
+
+  # Output 3
+  - type: custom:button-card
+    entity: number.output_3
+    name: Out 3
+    label: Input {{state}}
+    show_label: true
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: number.output_3
+      data:
+        value: >
+          [[[
+            return (parseInt(entity.state) % 8) + 1;
+          ]]]
+
+  # Output 4
+  - type: custom:button-card
+    entity: number.output_4
+    name: Out 4
+    label: Input {{state}}
+    show_label: true
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: number.output_4
+      data:
+        value: >
+          [[[
+            return (parseInt(entity.state) % 8) + 1;
+          ]]]
+
+  # Output 5
+  - type: custom:button-card
+    entity: number.output_5
+    name: Out 5
+    label: Input {{state}}
+    show_label: true
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: number.output_5
+      data:
+        value: >
+          [[[
+            return (parseInt(entity.state) % 8) + 1;
+          ]]]
+
+  # Output 6
+  - type: custom:button-card
+    entity: number.output_6
+    name: Out 6
+    label: Input {{state}}
+    show_label: true
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: number.output_6
+      data:
+        value: >
+          [[[
+            return (parseInt(entity.state) % 8) + 1;
+          ]]]
+
+  # Output 7
+  - type: custom:button-card
+    entity: number.output_7
+    name: Out 7
+    label: Input {{state}}
+    show_label: true
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: number.output_7
+      data:
+        value: >
+          [[[
+            return (parseInt(entity.state) % 8) + 1;
+          ]]]
+
+  # Output 8
+  - type: custom:button-card
+    entity: number.output_8
+    name: Out 8
+    label: Input {{state}}
+    show_label: true
+    tap_action:
+      action: call-service
+      service: number.set_value
+      target:
+        entity_id: number.output_8
+      data:
+        value: >
+          [[[
+            return (parseInt(entity.state) % 8) + 1;
+          ]]]
+
+  # Custom styling for all buttons
+styles:
+  grid:
+    - grid-template-columns: repeat(8, 1fr)
+    - grid-gap: 12px
+    - padding: 12px
+  card:
+    - background-color: var(--primary-background-color)
+    - border-radius: 10px
+    - box-shadow: var(--ha-card-box-shadow)
+    - padding: 16px
+  name:
+    - font-weight: bold
+    - font-size: 14px
+  label:
+    - font-size: 12px
+    - color: var(--primary-text-color)
+    - opacity: 0.8

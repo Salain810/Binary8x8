@@ -54,6 +54,41 @@ Click this button to open HACS and add the repository:
    - **Username**: Login username (default: admin)
    - **Password**: Login password
 
+## Dashboard Configuration
+
+### Prerequisites
+
+1. Install [Button Card](https://github.com/custom-cards/button-card) from HACS:
+   - Open HACS -> Frontend
+   - Search for "Button Card"
+   - Install and restart Home Assistant
+
+### Installation
+
+1. Copy the contents of [example-dashboard.yaml](example-dashboard.yaml) 
+2. In Home Assistant:
+   - Go to Overview
+   - Click the three dots menu in top right
+   - Select "Edit Dashboard"
+   - Click the three dots menu again
+   - Select "Raw configuration editor"
+   - Paste the configuration
+   - Click Save
+
+The dashboard provides:
+- 8x8 grid layout matching your matrix
+- Click to cycle through inputs for each output
+- Current input status display
+- Responsive design that works on mobile and desktop
+
+### Customizing the Dashboard
+
+You can modify the example-dashboard.yaml to:
+- Change button colors and styles
+- Add labels for your devices
+- Modify the layout
+- Add additional controls
+
 ## Usage
 
 ### Entities
