@@ -9,6 +9,7 @@ from homeassistant.components.number import (
     NumberEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -61,15 +62,19 @@ class MatrixOutputNumber(CoordinatorEntity, NumberEntity):
         self._output = output
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
-            name=f"Binary Matrix 8x8 ({entry.data['host']})",
+            name=f"Binary Matrix 8x8 ({entry.data[CONF_HOST]})",
             manufacturer="Binary",
             model="8x8 HDMI Matrix",
+            sw_version="1.0.0",
         )
         self._attr_unique_id = f"{entry.entry_id}_output_{output}"
         self._attr_native_min_value = 1
         self._attr_native_max_value = MATRIX_SIZE
         self._attr_native_step = 1
         self._attr_mode = "slider"
+        self._attr_icon = "mdi:video-input-hdmi"
+        self._attr_has_entity_name = True
+        self._attr_translation_key = "output"
 
     @property
     def name(self) -> str:
@@ -77,9 +82,9 @@ class MatrixOutputNumber(CoordinatorEntity, NumberEntity):
         return f"Output {self._output}"
 
     @property
-    def icon(self) -> str:
-        """Return the icon of the entity."""
-        return "mdi:hdmi-port"
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return self._matrix.connected and super().available
 
     @property
     def native_value(self) -> float | None:

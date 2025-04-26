@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "custom_components/**"
+      - ".github/workflows/release.yaml"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Get Previous Version
+        id: prev_version
+        run: |
+          PREV_VERSION=$(jq -r '.version' custom_components/binary_matrix/manifest.json)
+          echo "Previous version: $PREV_VERSION"
+          echo "prev_version=$PREV_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Determine Version Bump
+        id: bump
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if echo "$COMMIT_MSG" | grep -q "BREAKING CHANGE"; then
+            echo "Bumping major version"
+            echo "bump=major" >> $GITHUB_OUTPUT
+          elif echo "$COMMIT_MSG" | grep -q "feat"; then
+            echo "Bumping minor version"
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          else
+            echo "Bumping patch version"
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump Version
+        id: version
+        uses: christian-draeger/increment-semantic-version@1.1.0
+        with:
+          current-version: ${{ steps.prev_version.outputs.prev_version }}
+          version-fragment: ${{ steps.bump.outputs.bump }}
+
+      - name: Update manifest.json
+        run: |
+          VERSION="${{ steps.version.outputs.next-version }}"
+          echo "Updating version to $VERSION"
+          jq --arg version "$VERSION" '.version = $version' custom_components/binary_matrix/manifest.json > temp.json
+          mv temp.json custom_components/binary_matrix/manifest.json
+
+      - name: Commit Version Update
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add custom_components/binary_matrix/manifest.json
+          git commit -m "chore: bump version to ${{ steps.version.outputs.next-version }}"
+          git tag v${{ steps.version.outputs.next-version }}
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.next-version }}
+          name: Release v${{ steps.version.outputs.next-version }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

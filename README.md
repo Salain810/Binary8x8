@@ -6,6 +6,7 @@
 [![hacs][hacsbadge]][hacs]
 [![GitHub issues](https://img.shields.io/github/issues/Salain810/Binary8x8)](https://github.com/Salain810/Binary8x8/issues)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Semantic Versioning](https://img.shields.io/badge/Semantic%20Versioning-2.0.0-brightgreen)](https://semver.org/)
 
 Control your Binary Matrix 8x8 HDMI switcher through Home Assistant with an intuitive interface.
 
@@ -17,6 +18,7 @@ Control your Binary Matrix 8x8 HDMI switcher through Home Assistant with an intu
 - 🔌 Auto-reconnect on connection loss
 - 🎯 User-friendly configuration through Home Assistant UI
 - 🤖 Service calls for automation integration
+- 📦 Automatic semantic versioning
 
 ## Installation
 
@@ -81,13 +83,15 @@ The dashboard provides:
 - Current input status display
 - Responsive design that works on mobile and desktop
 
-### Customizing the Dashboard
+## Version Management
 
-You can modify the example-dashboard.yaml to:
-- Change button colors and styles
-- Add labels for your devices
-- Modify the layout
-- Add additional controls
+This integration uses automated semantic versioning:
+
+- Major version (x.0.0): Breaking changes
+- Minor version (0.x.0): New features
+- Patch version (0.0.x): Bug fixes and small changes
+
+Versions are automatically incremented based on commit messages when pushing to the main branch. For details on how this works, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Usage
 

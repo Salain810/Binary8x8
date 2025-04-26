@@ -2,12 +2,48 @@
 
 Thank you for considering contributing to the Binary Matrix Integration! This document provides guidelines and steps for contributing.
 
-## Code Style
+## Commit Message Convention
 
-- Follow Home Assistant's [Style Guidelines](https://developers.home-assistant.io/docs/development_guidelines)
-- Use [Black](https://github.com/psf/black) for Python code formatting
-- Use [isort](https://pycqa.github.io/isort/) for import sorting
-- Follow [PEP8](https://www.python.org/dev/peps/pep-0008/) guidelines
+This project uses semantic commit messages to automate version management. The commit message format is:
+
+```
+<type>: <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Types:
+- `feat`: A new feature (bumps minor version)
+- `fix`: A bug fix (bumps patch version)
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc)
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+### Breaking Changes
+
+To indicate a breaking change, include "BREAKING CHANGE:" in your commit message body:
+
+```
+feat: change output numbering scheme
+
+BREAKING CHANGE: Output numbers now start from 0 instead of 1
+```
+
+This will trigger a major version bump.
+
+## Version Management
+
+The project uses automated semantic versioning:
+- Major version (x.0.0): Breaking changes
+- Minor version (0.x.0): New features
+- Patch version (0.0.x): Bug fixes and small changes
+
+Version numbers are automatically updated based on commit messages when pushing to main/master.
 
 ## Development Environment Setup
 
@@ -36,7 +72,7 @@ Thank you for considering contributing to the Binary Matrix Integration! This do
    isort .
    ```
 
-## Submitting Changes
+## Pull Request Process
 
 1. Create a new branch for your changes:
    ```bash
@@ -44,45 +80,33 @@ Thank you for considering contributing to the Binary Matrix Integration! This do
    ```
 2. Make your changes
 3. Test your changes
-4. Commit your changes:
-   ```bash
-   git add .
-   git commit -m "Description of changes"
-   ```
-5. Push to your fork:
-   ```bash
-   git push origin your-feature-name
-   ```
-6. Create a Pull Request from your fork to our main repository
+4. Commit with semantic commit message
+5. Push to your fork
+6. Create a Pull Request
 
-## Pull Request Guidelines
+### Pull Request Guidelines
 
+- Use semantic commit messages
 - Describe your changes in detail
 - Reference any related issues
 - Update documentation if needed
 - Add tests for new features
 - Ensure all tests pass
-- Follow the existing code style
 
 ## Development Guidelines
 
-1. **Version Control**
-   - Make meaningful commit messages
-   - Keep commits focused and atomic
-   - Rebase your branch before submitting
-
-2. **Code Quality**
+1. **Code Quality**
    - Write clear, documented code
    - Add type hints to functions
    - Include docstrings for classes and methods
    - Add comments for complex logic
 
-3. **Testing**
+2. **Testing**
    - Write unit tests for new features
    - Update existing tests when modifying features
    - Ensure all tests pass before submitting
 
-4. **Documentation**
+3. **Documentation**
    - Update README.md if needed
    - Document new features
    - Update configuration examples
