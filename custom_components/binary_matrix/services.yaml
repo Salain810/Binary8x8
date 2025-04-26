@@ -1,0 +1,27 @@
+switch_input:
+  name: Switch Input
+  description: Switch an output to a specific input.
+  target: {}
+  fields:
+    output:
+      name: Output
+      description: Output number (1-8)
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 8
+          step: 1
+          mode: slider
+    input:
+      name: Input
+      description: Input number (1-8)
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 8
+          step: 1
+          mode: slider

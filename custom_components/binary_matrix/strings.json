@@ -1,0 +1,48 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Set up Binary Matrix 8x8 HDMI Switcher",
+                "data": {
+                    "name": "Name",
+                    "host": "Host",
+                    "port": "Port",
+                    "username": "Username",
+                    "password": "Password"
+                }
+            },
+            "reauth_confirm": {
+                "title": "Reauthenticate with Binary Matrix",
+                "description": "The password needs to be updated.",
+                "data": {
+                    "password": "Password"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "Unexpected error"
+        },
+        "abort": {
+            "already_configured": "Device is already configured",
+            "reauth_successful": "Reauthentication was successful"
+        }
+    },
+    "services": {
+        "switch_input": {
+            "name": "Switch Input",
+            "description": "Switch an output to a specific input.",
+            "fields": {
+                "output": {
+                    "name": "Output",
+                    "description": "Output number (1-8)"
+                },
+                "input": {
+                    "name": "Input",
+                    "description": "Input number (1-8)"
+                }
+            }
+        }
+    }
+}
