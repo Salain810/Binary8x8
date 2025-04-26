@@ -1,7 +1,10 @@
 """Matrix controller for Binary Matrix 8x8 HDMI Switcher."""
 import asyncio
 import logging
-from typing import Dict, Optional, Tuple
+import telnetlib3
+from typing import Dict, Optional
+
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,53 +51,47 @@ class MatrixController:
         """Connect to the matrix and authenticate."""
         try:
             _LOGGER.debug("Connecting to %s:%d", self._host, self._port)
-            self._reader, self._writer = await asyncio.open_connection(
+            
+            # Open connection
+            self._reader, self._writer = await telnetlib3.open_connection(
                 self._host, self._port
             )
-        except (OSError, ConnectionError) as err:
-            _LOGGER.error("Failed to connect to %s:%d - %s", self._host, self._port, err)
-            raise MatrixConnectionError("Cannot connect to the device") from err
 
-        try:
-            # Wait for login prompt with timeout
-            try:
-                data = await asyncio.wait_for(self._read_until("Login: "), timeout=5.0)
-                _LOGGER.debug("Received login prompt: %s", data)
-            except asyncio.TimeoutError as err:
-                raise MatrixConnectionError("Timeout waiting for login prompt") from err
+            # Wait for login prompt
+            data = await self._read_until(b"Login:", timeout=3)
+            _LOGGER.debug("Got login prompt: %s", data)
 
             # Send username
             await self._write(f"{self._username}\n")
-            
-            # Wait for password prompt with timeout
-            try:
-                data = await asyncio.wait_for(self._read_until("Password: "), timeout=5.0)
-                _LOGGER.debug("Received password prompt: %s", data)
-            except asyncio.TimeoutError as err:
-                raise MatrixConnectionError("Timeout waiting for password prompt") from err
+
+            # Wait for password prompt
+            data = await self._read_until(b"Password:", timeout=3)
+            _LOGGER.debug("Got password prompt: %s", data)
 
             # Send password
             await self._write(f"{self._password}\n")
 
-            # Check for successful login
-            try:
-                data = await asyncio.wait_for(self._read_until(">"), timeout=5.0)
-                if "Logged in successfully" not in data:
-                    raise MatrixAuthError("Invalid username or password")
-                _LOGGER.debug("Login successful")
-            except asyncio.TimeoutError as err:
-                raise MatrixConnectionError("Timeout waiting for login response") from err
+            # Wait for successful login
+            data = await self._read_until(b">", timeout=10)
+            _LOGGER.debug("Login response: %s", data)
+
+            if b"Logged in successfully" not in data:
+                raise MatrixAuthError("Invalid credentials")
 
             self._connected = True
+            _LOGGER.info("Successfully connected to matrix")
+
+            # Get initial state
             await self.update_state()
 
+        except asyncio.TimeoutError as err:
+            _LOGGER.error("Connection timed out")
+            raise MatrixConnectionError("Connection timed out") from err
         except Exception as err:
-            self._connected = False
-            await self.disconnect()
-            if isinstance(err, (MatrixConnectionError, MatrixAuthError)):
+            _LOGGER.error("Connection failed: %s", str(err))
+            if isinstance(err, MatrixError):
                 raise
-            _LOGGER.error("Unexpected error during connection: %s", err)
-            raise MatrixError("Unknown error occurred during connection") from err
+            raise MatrixConnectionError(f"Failed to connect: {err}") from err
 
     async def disconnect(self) -> None:
         """Disconnect from the matrix."""
@@ -127,16 +124,15 @@ class MatrixController:
     async def _send_command(self, command: str) -> str:
         """Send a command and return the response."""
         if not self._connected:
-            raise MatrixConnectionError("Not connected to the device")
+            raise MatrixConnectionError("Not connected")
 
         try:
             await self._write(f"{command}\n")
-            response = await self._read_until(">")
-            return response.strip()
+            response = await self._read_until(b">", timeout=5)
+            return response.decode().strip()
         except Exception as err:
             self._connected = False
-            _LOGGER.error("Error sending command %s: %s", command, err)
-            raise MatrixConnectionError("Lost connection to the device") from err
+            raise MatrixConnectionError(f"Command failed: {err}") from err
 
     async def _write(self, data: str) -> None:
         """Write data to the telnet connection."""
@@ -146,33 +142,28 @@ class MatrixController:
             self._writer.write(data.encode())
             await self._writer.drain()
         except Exception as err:
-            _LOGGER.error("Error writing to device: %s", err)
-            raise MatrixConnectionError("Failed to send data to device") from err
+            raise MatrixConnectionError(f"Write failed: {err}") from err
 
-    async def _read_until(self, expected: str, timeout: float = 5.0) -> str:
-        """Read data until the expected string is found."""
+    async def _read_until(self, expected: bytes, timeout: float) -> bytes:
+        """Read data until the expected bytes are found."""
         if self._reader is None:
             raise MatrixConnectionError("Not connected")
 
         try:
-            data = ""
+            data = b""
             while True:
-                byte_data = await asyncio.wait_for(
+                chunk = await asyncio.wait_for(
                     self._reader.read(1024),
                     timeout=timeout
                 )
-                if not byte_data:
-                    raise MatrixConnectionError("Connection closed by device")
+                if not chunk:
+                    raise MatrixConnectionError("Connection closed")
                 
-                data += byte_data.decode()
+                data += chunk
                 if expected in data:
                     return data
         except asyncio.TimeoutError as err:
-            _LOGGER.error("Timeout waiting for response")
-            raise MatrixConnectionError("Timeout waiting for device response") from err
-        except Exception as err:
-            _LOGGER.error("Error reading from device: %s", err)
-            raise MatrixConnectionError("Failed to read from device") from err
+            raise MatrixConnectionError("Read timeout") from err
 
     def _parse_state_map(self, response: str) -> Dict[int, int]:
         """Parse the STMAP response into a state dictionary."""
@@ -184,7 +175,6 @@ class MatrixController:
                     input_ = int(line[4:6])
                     state[output] = input_
                 except ValueError:
-                    _LOGGER.warning("Invalid state map line: %s", line)
                     continue
         return state
 
